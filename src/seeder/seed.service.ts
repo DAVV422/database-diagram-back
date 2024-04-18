@@ -15,8 +15,11 @@ export class SeedService {
     if (process.env.APP_PROD == true) return { message: 'No se puede ejecutar seeders en producción' };
     try {
       const user: CreateUserDto = {
-        nombre: 'diego',
-        apellido: 'vargas',
+        name: 'diego',
+        last_name: 'vargas',
+        cellphone: '67303324',
+        birthdate: '2000-04-18',
+        grade: 'Bombero I 3er Año',
         email: 'diego@live.com',
         password: '123456789',
         role: ROLES.ADMIN,
