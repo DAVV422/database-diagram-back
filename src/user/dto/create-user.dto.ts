@@ -12,7 +12,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
-  name: string;
+  nombre: string;
 
   @ApiProperty({
     example: 'John Doe',
@@ -22,7 +22,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
-  last_name: string;
+  apellido: string;
 
   @ApiProperty({
     example: 'john@live.com',
@@ -32,32 +32,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @IsEmail()
-  email: string;
-
-  @ApiProperty({
-    example: '67303349',
-    type: String,
-    description: 'Numero de celular del usuario',
-  })  
-  @IsString()  
-  @MinLength(8)
-  cellphone?: string;
-
-  @ApiProperty({
-    example: 'Capitán',
-    type: String,
-    description: 'Grado Jerárquico del usuario',
-  })  
-  @IsString()    
-  grade?: string;
-
-  @ApiProperty({
-    example: '18/04/2000',
-    type: String,
-    description: 'Fecha de Nacimiento del usuario',
-  })  
-  @IsString()  
-  birthdate?: string;
+  email: string;  
 
   @ApiProperty({
     example: '123456',
