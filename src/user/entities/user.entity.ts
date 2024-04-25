@@ -9,13 +9,22 @@ import { IUser } from '../interfaces/user.interface';
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntity implements IUser {
   @Column()
-  nombre: string;
+  name: string;
 
   @Column()
-  apellido: string;
+  last_name: string;
 
   @Column({ unique: true })
   email: string;
+
+  @Column({ nullable: true })
+  cellphone: string;
+
+  @Column({ nullable: true })
+  grade: string;
+
+  @Column({ nullable: true })
+  birthdate: Date;
 
   @Exclude()
   @Column()
