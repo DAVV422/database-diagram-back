@@ -44,7 +44,7 @@ export class UserService {
 
   public async findOne(id: string): Promise<UserEntity> {
     try {
-      const user: UserEntity = await this.userRepository.findOne({ where: { id } });
+      const user: UserEntity = await this.userRepository.findOne({ where: { id }, relations: ['diagramas'] });
       if (!user) throw new NotFoundException('Usuario no encontrado.');
       return user;
     } catch (error) {
@@ -56,7 +56,7 @@ export class UserService {
     try {
       if (updateUserDto.password) updateUserDto.password = await this.encryptPassword(updateUserDto.password);
       const user: UserEntity = await this.findOne(id);
-      const userUpdated = await this.userRepository.update(user.id, updateUserDto,);
+      const userUpdated = await this.userRepository.update(user.id, updateUserDto);
       if (userUpdated.affected === 0) throw new NotFoundException('Usuario no actualizado.');
       return await this.findOne(id);
     } catch (error) {
