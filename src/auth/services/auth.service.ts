@@ -65,7 +65,7 @@ export class AuthService {
     });
     return {
       accessToken,
-      User: getUser,
+      user: getUser,
     };
   }
 

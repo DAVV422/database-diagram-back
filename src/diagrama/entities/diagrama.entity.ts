@@ -9,6 +9,12 @@ import { InvitacionEntity } from './invitacion.entity';
 @Entity({ name: 'diagrama' })
 export class DiagramaEntity extends BaseEntity {
   @Column()
+  nombre: string;
+
+  @Column({ nullable: true})
+  fecha: Date;
+
+  @Column()
   nodos: string;
 
   @Column()

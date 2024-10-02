@@ -7,7 +7,7 @@ export class CreateInvitacionDto {
   @ApiProperty({
     example: '2024-01-01',
     type: Date,
-    description: 'Fecha de creacion de la fecha',
+    description: 'Fecha de invitacion',
   })
   @IsNotEmpty()
   @IsDate()

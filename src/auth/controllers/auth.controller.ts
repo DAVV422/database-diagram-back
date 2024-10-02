@@ -30,7 +30,7 @@ export class AuthController {
   }
 
   @ApiQuery({ name: 'token', type: 'string', required: true })
-  @Get('checkToken')
+  @Post('checkToken')
   public async checkToken(@Query('token') token: string): Promise<ResponseMessage> {
     return {
       statusCode: 200,

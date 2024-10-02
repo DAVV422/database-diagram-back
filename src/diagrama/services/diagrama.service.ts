@@ -36,10 +36,10 @@ export class DiagramaService {
     }
   }
 
-  public async createDiagram(createDiagramaDto: CreateDiagramaDto): Promise<DiagramaEntity> {
+  public async createDiagram(createDiagramaDto: CreateDiagramaDto, userId: string): Promise<DiagramaEntity> {
     try {
         const { usuario, ...rest } = createDiagramaDto;
-        const user = await this.userService.findOne(usuario);
+        const user = await this.userService.findOne(userId);
         const diagrama = this.diagramaRepository.create({
             ...rest,
             usuario: { id: user.id },

@@ -5,65 +5,71 @@ import { AuthGuard, RolesGuard } from '../../auth/guards/';
 import { UpdateDiagramaDto } from '../dto/update-diagram.dto';
 import { DiagramaService } from '../services/diagrama.service';
 import { QueryDto } from '../../common/dto/query.dto';
-import { ResponseMessage } from 'src/common/interfaces/responseMessage.interface';
+import { ResponseMessage } from './../../common/interfaces/responseMessage.interface';
 import { CreateDiagramaDto } from '../dto';
+import { GetUser } from './../../auth/decorators';
 
 @ApiTags('Diagrama')
 @ApiBearerAuth()
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard)
 @Controller('diagrama')
 export class DiagramaController {
   constructor(private readonly diagramaService: DiagramaService) { }
 
-  @ApiParam({ name: 'id', type: 'string'})
-  @Get(':id')
-  public async findCreados(@Param('id', ParseUUIDPipe) id: string): Promise<ResponseMessage> {
-    return {
-      statusCode: 200,
-      data: await this.diagramaService.findByCreador(id),
-    };
-  }
+  // @ApiParam({ name: 'id', type: 'string'})
+  // @Get(':id')
+  // public async findCreados(@Param('id', ParseUUIDPipe) id: string): Promise<ResponseMessage> {
+  //   return {
+  //     statusCode: 200,
+  //     data: await this.diagramaService.findByCreador(id),
+  //   };
+  // }
   
-  @Post()
-  public async createDiagram(@Body() createDiagram: CreateDiagramaDto): Promise<ResponseMessage> {
+  @ApiParam({ name: 'userId', type: 'string'})
+  @Post(":userId")  
+  public async createDiagram(
+    @Body() createDiagram: CreateDiagramaDto, 
+    @Param('userId', ParseUUIDPipe) userId: string
+  ): Promise<ResponseMessage> {
     return {
       statusCode: 200,
-      data: await this.diagramaService.createDiagram(createDiagram),
+      data: await this.diagramaService.createDiagram(createDiagram, userId),
     };
   }
 
   @ApiParam({ name: 'userId', type: 'string'})
-  @Get('/byinvitacion/:userId')
-  public async findbyInvitaciones(@Param('userId', ParseUUIDPipe) id: string): Promise<ResponseMessage> {
+  @Get('/byinvitacion/userId')
+  public async findbyInvitaciones(@Param('userId', ParseUUIDPipe) userId: string): Promise<ResponseMessage> {
     return {
       statusCode: 200,
-      data: await this.diagramaService.findDiagramaByInvitacionUser(id),
+      data: await this.diagramaService.findDiagramaByInvitacionUser(userId),
     };
   }
+
 
   @ApiParam({ name: 'userId', type: 'string'})
   @Get('created/:userId')
-  public async finbyCreated(@Param('userId', ParseUUIDPipe) id: string): Promise<ResponseMessage> {
+  public async finbyCreated(@Param('userId', ParseUUIDPipe) userId: string): Promise<ResponseMessage> {
     return {
       statusCode: 200,
-      data: await this.diagramaService.findByCreador(id),
+      data: await this.diagramaService.findByCreador(userId),
     };
   }
 
-  //obtener invitaciones
+  //obtener invitaciones  
   @ApiParam({ name: 'userId', type: 'string'})
   @Get('invitaciones/:userId')
-  public async findInvitaciones(@Param('userId', ParseUUIDPipe) id: string): Promise<ResponseMessage> {
+  public async findInvitaciones(@Param('userId', ParseUUIDPipe) userId: string,): Promise<ResponseMessage> {
     return {
       statusCode: 200,
-      data: await this.diagramaService.findInvitacionesByUser(id),
+      data: await this.diagramaService.findInvitacionesByUser(userId),
     };
   }
 
   //invitar
   @ApiParam({ name: 'userId', type: 'string'})
   @ApiParam({ name: 'diagramaId', type: 'string'})
-  @Post('invitacion')
+  @Post('invitacion/:userId/:diagramaId')
   public async invitar(
     @Param('userId', ParseUUIDPipe) userId: string, 
     @Param('diagramaId', ParseUUIDPipe) diagramaId: string

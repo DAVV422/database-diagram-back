@@ -7,5 +7,6 @@ export interface NodoAtributo {
 export interface NodoDiagrama {
     key: number;
     name: string;
+    loc: any;
     attributes: Array<NodoAtributo>;
 }

@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, InternalServerErrorException, UnauthorizedException, } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, InternalServerErrorException, Logger, UnauthorizedException, } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 
@@ -8,14 +8,16 @@ import { IUserToken } from '../interfaces/userToken.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+
+  private readonly logger = new Logger('Guard');
   constructor(
     private readonly userService: UserService,
     private readonly reflector: Reflector,
   ) { }
   async canActivate(context: ExecutionContext) {
     try {
-      const request: any = context.switchToHttp().getRequest<Request>();
-      const token = request.headers.authorization?.split(' ')[1];
+      const request: any = context.switchToHttp().getRequest<Request>();      
+      const token = request.headers.authorization?.split(' ')[1];      
       if (!token || Array.isArray(token))
         throw new UnauthorizedException('Token no encontrado');
       const managerToken: IUserToken | string = userToken(token);

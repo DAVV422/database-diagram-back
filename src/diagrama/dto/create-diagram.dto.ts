@@ -1,8 +1,26 @@
 import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateDiagramaDto {
+  @ApiProperty({
+    example: `Diagrama 1`,
+    type: String,
+    description: 'Nombre del diagrama',
+  })
+  @IsNotEmpty()
+  @IsString()
+  nombre: string;
+
+  @ApiProperty({
+    example: `2024-05-03`,
+    type: Date,
+    description: 'Fecha de Creación del diagrama',
+  })
+  @IsNotEmpty()
+  @IsDate()
+  fecha: Date;
+
   @ApiProperty({
     example: `{ key: 1, name: "BankAccount", attributes: [ { name: "owner", type: "String", visibility: "public" }, { name: "balance", type: "Currency", visibility: "public", default: "0" } ] }`,
     type: String,
