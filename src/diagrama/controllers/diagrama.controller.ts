@@ -38,7 +38,7 @@ export class DiagramaController {
   }
 
   @ApiParam({ name: 'userId', type: 'string'})
-  @Get('/byinvitacion/userId')
+  @Get('/byinvitacion/:userId')
   public async findbyInvitaciones(@Param('userId', ParseUUIDPipe) userId: string): Promise<ResponseMessage> {
     return {
       statusCode: 200,
@@ -63,6 +63,20 @@ export class DiagramaController {
     return {
       statusCode: 200,
       data: await this.diagramaService.findInvitacionesByUser(userId),
+    };
+  }
+
+
+  //invitar
+  @ApiParam({ name: 'diagramaId', type: 'string'})
+  @Post('invitacionbyemail/:diagramaId')
+  public async invitarByEmail(
+    @Body('email') email: string, 
+    @Param('diagramaId', ParseUUIDPipe) diagramaId: string
+  ): Promise<ResponseMessage> {
+    return {
+      statusCode: 200,
+      data: await this.diagramaService.invitarByEmail(email, diagramaId),
     };
   }
 
@@ -102,10 +116,34 @@ export class DiagramaController {
     };
   }
 
+  //Actualizar una invitacion
+  @ApiParam({ name: 'id', type: 'string' })
+  @Patch('invitacion/:id')
+  public async updateInvitacion(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<ResponseMessage> {
+    return {
+      statusCode: 200,
+      data: await this.diagramaService.updateInvitacion(id),
+    };
+  }
+
   //Eliminar un diagrama
   @ApiParam({ name: 'id', type: 'string' })
   @Delete(':id')
   public async delete(@Param('id', ParseUUIDPipe) id: string): Promise<ResponseMessage> {
     return await this.diagramaService.delete(id);
   }
+
+  //invitar by qr
+  @ApiParam({ name: 'idDiagrama', type: 'string' })
+  @Get('qr/:idDiagrama')
+  public async invitarQR(@Param('idDiagrama', ParseUUIDPipe) idDiagrama: string): Promise<ResponseMessage> {
+    return {
+      statusCode: 200,
+      data: await this.diagramaService.invitarQR(idDiagrama),
+    }
+  }
+
+
 }

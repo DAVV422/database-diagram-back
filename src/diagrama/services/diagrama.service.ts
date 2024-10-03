@@ -2,6 +2,8 @@ import { Repository } from 'typeorm';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
+import * as qr from 'qrcode';
+
 import { handlerError } from '../../common/utils/handlerError.utils';
 import { QueryDto } from '../../common/dto/query.dto';
 import { ResponseMessage } from '../../common/interfaces/responseMessage.interface';
@@ -11,6 +13,7 @@ import { DiagramaEntity } from '../entities/diagrama.entity';
 import { ESTADO } from 'src/common/constants/estado';
 import { InvitacionEntity } from '../entities/invitacion.entity';
 import { UserService } from 'src/user/services/user.service';
+import { EnvConfig } from 'src/config/app.config';
 
 @Injectable()
 export class DiagramaService {
@@ -61,6 +64,16 @@ export class DiagramaService {
     }
   }
 
+  public async findInvitacion(id: string): Promise<InvitacionEntity> {
+    try {
+      const invitacion: InvitacionEntity = await this.invitacionRepository.findOne({ where: { id } });
+      if (!invitacion) throw new NotFoundException('Invitacion no encontrada.');
+      return invitacion;
+    } catch (error) {
+      handlerError(error, this.logger);
+    }
+  }
+
   public async update(id: string, updateDiagramaDto: UpdateDiagramaDto,): Promise<DiagramaEntity> {
     try {
         const { usuario, ...rest } = updateDiagramaDto;
@@ -68,6 +81,17 @@ export class DiagramaService {
       const diagramaUpdated = await this.diagramaRepository.update(diagrama.id, rest);
       if (diagramaUpdated.affected === 0) throw new NotFoundException('Diagrama no actualizado.');
       return await this.findOne(id);
+    } catch (error) {
+      handlerError(error, this.logger);
+    }
+  }
+
+  public async updateInvitacion(id: string): Promise<boolean> {
+    try {
+      const invitacion: InvitacionEntity = await this.findInvitacion(id);
+      const invitacionUpdated = await this.invitacionRepository.update(invitacion.id, { estado: ESTADO.ACEPTADO});
+      if (invitacionUpdated.affected === 0) throw new NotFoundException('Diagrama no actualizado.');
+      return true;
     } catch (error) {
       handlerError(error, this.logger);
     }
@@ -104,7 +128,10 @@ export class DiagramaService {
 
   public async findDiagramaByInvitacionUser(id: string): Promise<DiagramaEntity[]> {
     try {
-        const diagramas: DiagramaEntity[] = await this.diagramaRepository.find({ where: { invitacion: { estado: ESTADO.ACEPTADO , usuario: { id } }, isDeleted: false } });
+        const diagramas: DiagramaEntity[] = await this.diagramaRepository.find(
+          { where: { invitacion: { estado: ESTADO.ACEPTADO , usuario: { id } }, isDeleted: false }, relations: ['usuario'] }
+        );
+        this.logger.log(diagramas);
       return diagramas;
     } catch (error) {
       handlerError(error, this.logger);
@@ -114,7 +141,7 @@ export class DiagramaService {
   public async invitar(userId: string, diagramaId: string){
     try {
         const invitacion = this.invitacionRepository.create({
-            fecha: Date.now(),
+            fecha: new Date(Date.now()),
             estado: ESTADO.PENDIENTE,
             usuario: { id: userId },
             diagrama: { id: diagramaId }
@@ -126,12 +153,35 @@ export class DiagramaService {
     }
   }
 
+  public async invitarByEmail(email: string, diagramaId: string){
+    try {
+        const user = await this.userService.findOneBy({key: 'email', value: email});
+        if(!user) throw new NotFoundException('Usuario no encontrado.'); 
+        const invitacion = await this.invitacionRepository.create({
+            fecha: new Date(Date.now()),
+            estado: ESTADO.PENDIENTE,
+            usuario: { id: user.id },
+            diagrama: { id: diagramaId }
+        });
+        const invitacionCreated: InvitacionEntity = await this.invitacionRepository.save(invitacion);
+        return invitacionCreated;
+    } catch (error) {
+        handlerError(error, this.logger);
+    }
+  }
+
   public async findInvitacionesByUser(userId: string): Promise<InvitacionEntity[]> {
     try{
-        const invitacion: InvitacionEntity[] = await this.invitacionRepository.find({ where: { usuario: { id: userId } }, relations: ['diagrama'] });
+        const invitacion: InvitacionEntity[] = await this.invitacionRepository.find({ where: { usuario: { id: userId }, estado: ESTADO.PENDIENTE }, relations: ['diagrama','diagrama.usuario'] });
         return invitacion;
     } catch (error) {
       handlerError(error, this.logger);
     }
+  }
+
+  public async invitarQR(idDiagrama: string): Promise<any> {
+    const data = EnvConfig().FRONTEND_URL + "/auth/invitacion-qr/" + idDiagrama;
+    const qrCodeImage = await qr.toDataURL(data);
+    return qrCodeImage;
   }
 }

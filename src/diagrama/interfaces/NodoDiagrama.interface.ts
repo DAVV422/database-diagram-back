@@ -10,3 +10,10 @@ export interface NodoDiagrama {
     loc: any;
     attributes: Array<NodoAtributo>;
 }
+
+export interface LinkDiagrama {
+    key: number;
+    text: string;
+    toText: string;
+    relationship: string;
+}
